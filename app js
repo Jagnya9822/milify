@@ -1,0 +1,17 @@
+import React from 'react';
+import Procurement from './components/Procurement';
+import WageManagement from './components/WageManagement';
+import ProductionWorkflow from './components/ProductionWorkflow';
+
+const App = () => {
+  return (
+    <div>
+      <h1>Milify - Rice Mill Management System</h1>
+      <Procurement />
+      <WageManagement />
+      <ProductionWorkflow />
+    </div>
+  );
+};
+
+export default App;
