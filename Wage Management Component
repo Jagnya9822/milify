@@ -1,0 +1,57 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const WageManagement = () => {
+  const [workerName, setWorkerName] = useState('');
+  const [wageRate, setWageRate] = useState('');
+  const [hoursWorked, setHoursWorked] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:8000/api/wage-management/', {
+        worker_name: workerName,
+        wage_rate: wageRate,
+        hours_worked: hoursWorked,
+      });
+      alert('Wage details added successfully');
+    } catch (error) {
+      console.error('Error adding wage details:', error);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Wage Management</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Worker Name:</label>
+          <input
+            type="text"
+            value={workerName}
+            onChange={(e) => setWorkerName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Wage Rate:</label>
+          <input
+            type="number"
+            value={wageRate}
+            onChange={(e) => setWageRate(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Hours Worked:</label>
+          <input
+            type="number"
+            value={hoursWorked}
+            onChange={(e) => setHoursWorked(e.target.value)}
+          />
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+};
+
+export default WageManagement;
