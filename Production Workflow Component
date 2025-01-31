@@ -1,0 +1,67 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const ProductionWorkflow = () => {
+  const [stage, setStage] = useState('');
+  const [status, setStatus] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:8000/api/production-workflow/', {
+        stage: stage,
+        status: status,
+        start_time: startTime,
+        end_time: endTime,
+      });
+      alert('Production workflow added successfully');
+    } catch (error) {
+      console.error('Error adding production workflow:', error);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Production Workflow</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Stage:</label>
+          <input
+            type="text"
+            value={stage}
+            onChange={(e) => setStage(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Status:</label>
+          <input
+            type="text"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Start Time:</label>
+          <input
+            type="datetime-local"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>End Time:</label>
+          <input
+            type="datetime-local"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+          />
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+};
+
+export default ProductionWorkflow;
