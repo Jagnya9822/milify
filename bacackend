@@ -1,0 +1,81 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import List
+import sqlite3
+
+# Initialize FastAPI app
+app = FastAPI()
+
+# Database setup
+def init_db():
+    conn = sqlite3.connect("milify.db")
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS paddy_procurement (
+                      id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      supplier_name TEXT,
+                      quantity INTEGER,
+                      price REAL,
+                      date TEXT)''')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS workers (
+                      id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      name TEXT,
+                      daily_wage REAL,
+                      monthly_wage REAL)''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+# Data Models
+class PaddyProcurement(BaseModel):
+    supplier_name: str
+    quantity: int
+    price: float
+    date: str
+
+class Worker(BaseModel):
+    name: str
+    daily_wage: float
+    monthly_wage: float
+
+# API Endpoints
+@app.post("/add_paddy/")
+def add_paddy(data: PaddyProcurement):
+    conn = sqlite3.connect("milify.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO paddy_procurement (supplier_name, quantity, price, date) VALUES (?, ?, ?, ?)",
+                   (data.supplier_name, data.quantity, data.price, data.date))
+    conn.commit()
+    conn.close()
+    return {"message": "Paddy procurement recorded successfully."}
+
+@app.get("/get_paddy/", response_model=List[PaddyProcurement])
+def get_paddy():
+    conn = sqlite3.connect("milify.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT supplier_name, quantity, price, date FROM paddy_procurement")
+    data = cursor.fetchall()
+    conn.close()
+    return [{"supplier_name": d[0], "quantity": d[1], "price": d[2], "date": d[3]} for d in data]
+
+@app.post("/add_worker/")
+def add_worker(worker: Worker):
+    conn = sqlite3.connect("milify.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO workers (name, daily_wage, monthly_wage) VALUES (?, ?, ?)",
+                   (worker.name, worker.daily_wage, worker.monthly_wage))
+    conn.commit()
+    conn.close()
+    return {"message": "Worker added successfully."}
+
+@app.get("/get_workers/", response_model=List[Worker])
+def get_workers():
+    conn = sqlite3.connect("milify.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT name, daily_wage, monthly_wage FROM workers")
+    data = cursor.fetchall()
+    conn.close()
+    return [{"name": d[0], "daily_wage": d[1], "monthly_wage": d[2]} for d in data]
+
+# Run the API with uvicorn
+# Command: uvicorn filename:app --reload
